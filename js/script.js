@@ -43,8 +43,8 @@ var acsStyle = function (feature, latlng) {
         weight: 1,
         opacity: .25,
         color: 'grey',
-        fillOpacity: fillOpacity(calc[2]),
-        fillColor: fillColorPercentage(calc[2])
+        fillOpacity: fillOpacity(calc.percentage),
+        fillColor: fillColorPercentage(calc.percentage)
     };
 
     return style;
@@ -52,13 +52,13 @@ var acsStyle = function (feature, latlng) {
 }
 
 function calculatePercentage(feature) {
-    var output = [];
+    var output = {};
     var numerator = parseFloat(feature.properties.ACS_13_5YR_B07201_HD01_VD14);
     var denominator = parseFloat(feature.properties.ACS_13_5YR_B07201_HD01_VD01);
     var percentage = ((numerator/denominator) * 100).toFixed(0);
-    output.push(numerator);
-    output.push(denominator);
-    output.push(percentage);
+    output.numerator = numerator;
+    output.denominator = denominator;
+    output.percentage = percentage;
     return output;    
 }
 
@@ -91,7 +91,7 @@ var acsOnEachFeature = function(feature,layer){
     // let's bind some feature properties to a pop up with an .on("click", ...) command. We do this so we can fire it both on and off the map
     layer.on("click", function (e) {
         var bounds = layer.getBounds();
-        var popupContent = "<strong>Total Population:</strong> " + calc[1] + "<br /><strong>Population Moved to US in Last Year:</strong> " + calc[0] + "<br /><strong>Percentage Moved to US in Last Year:</strong> " + calc[2] + "%";
+        var popupContent = "<strong>Total Population:</strong> " + calc.denominator + "<br /><strong>Population Moved to US in Last Year:</strong> " + calc.numerator + "<br /><strong>Percentage Moved to US in Last Year:</strong> " + calc.percentage + "%";
         popup.setLatLng(bounds.getCenter());
         popup.setContent(popupContent);
         map.openPopup(popup);
@@ -155,6 +155,10 @@ legend.addTo(map);
 function createListForClick(dataset) {
     // use d3 to select the div and then iterate over the dataset appending a list element with a link for clicking and firing
     // first we'll create an unordered list ul elelemnt inside the <div id='list'></div>. The result will be <div id='list'><ul></ul></div>
+
+    //d3.select("#list").append('h1').text('List of Census Tracts in Brooklyn');
+
+
     var ULs = d3.select("#list")
                 .append("ul");
 
@@ -185,7 +189,7 @@ function createListForClick(dataset) {
 $.getJSON( "https://data.cityofnewyork.us/resource/erm2-nwe9.json?$$app_token=rQIMJbYqnCnhVM9XNPHE9tj0g&borough=BROOKLYN&complaint_type=Noise&status=Open", function( data ) {
     var dataset = data;
     // draw the dataset on the map
-    plotAPIData(dataset);
+    // plotAPIData(dataset);
 
 });
 
